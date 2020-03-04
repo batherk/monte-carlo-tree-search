@@ -22,6 +22,15 @@ class Game:
             return 1
             
     def get_winner(self):
-        if self.is_done:
+        if self.is_done():
             return self.get_other_player()
+
+    def get_end_result(self):
+        winner = self.get_winner()
+        if winner == 1:
+            return 1
+        elif winner == 2:
+            return -1 
+
+
 

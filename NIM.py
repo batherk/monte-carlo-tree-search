@@ -32,3 +32,9 @@ class NIM(Game):
 
     def is_done(self):
         return self.current_amount_pieces==0
+    
+    def create_simulation_copy(self):
+        return NIM(self.current_amount_pieces, self.max_amount_remove, self.current_player)
+
+    def get_state(self):
+        return self.current_amount_pieces

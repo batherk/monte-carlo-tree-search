@@ -1,4 +1,5 @@
 from Game import Game, random
+from copy import deepcopy
 
 class Ledge(Game):
 
@@ -47,4 +48,10 @@ class Ledge(Game):
 
     def is_done(self):
         return self.board.count(2) == 0
+
+    def create_simulation_copy(self):
+        return Ledge(deepcopy(self.board), self.current_player)
+
+    def get_state(self):
+        return tuple(self.board)
         
