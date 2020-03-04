@@ -5,10 +5,10 @@ class Ledge(Game):
 
     def __init__(self, board_init, starting_player=1):
         super(Ledge,self).__init__(starting_player)
-        for value in board:
+        for value in board_init:
             if value not in [0,1,2]:
                 raise RuntimeError('Board should only contain 0,1 or 2.')
-        if board.count(2) != 1:
+        if board_init.count(2) != 1:
             raise RuntimeError('The board should have one Gold coin (2)')
         self.board = board_init
 

@@ -21,7 +21,7 @@ class RandomActor:
             best_value = -1
         else:
             best_value = 1
-    
+
         for action in self.states[state]["actions"]:
             sum_results = self.states[state]['actions'][action]["sum_results"]
             visited = self.states[state]['actions'][action]["visited"]
@@ -31,7 +31,6 @@ class RandomActor:
             if self.max and average > best_value or not self.max and average < best_value:
                 best_action = action
                 best_value = average
-
         return best_action
 
     def update(self, state, action, reward):
