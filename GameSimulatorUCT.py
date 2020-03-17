@@ -2,6 +2,7 @@ import re
 from Ledge import Ledge
 from NIM import NIM
 from UCT_Tree import UCTTree
+from copy import deepcopy
 
 # Constants
 GAME_TYPES = ["NIM","Ledge"]
@@ -12,7 +13,7 @@ USE_UI = False
 
 GAME_TYPE = "Ledge"
 ROLLOUT_ITERATIONS = 500
-GAME_ITERATIONS = 1
+GAME_ITERATIONS = 50
 STARTING_PLAYER = 1
 
 # NIM
@@ -22,7 +23,7 @@ MAX_REMOVE = 7
 # Ledge
 BOARD = [1,0,1,2,0,1]
 
-VERBOSE = True
+VERBOSE = False
 
 # Help functions
 
@@ -75,7 +76,7 @@ class GameSimulatorUCT:
         if self.game_type =="NIM":
             return NIM(self.starting_pieces, self.max_remove, self.starting_player)
         elif self.game_type == "Ledge":
-            return Ledge(self.board, self.starting_player)
+            return Ledge(deepcopy(self.board), self.starting_player)
 
     def simulate_default(self, game):
         first_action = None
@@ -91,6 +92,8 @@ class GameSimulatorUCT:
 
     def simulate_tree(self,game):
         sequence = []
+        if self.verbose:
+            print(game)
         while not game.is_done():
             state = game.get_state()
             
@@ -101,6 +104,8 @@ class GameSimulatorUCT:
             action = self.tree.select_action(game)
             game.perform_action(action)
             sequence.append((state,action))
+            if self.verbose:
+                print(game)
         return sequence[:-1]
 
     def backup(self, state_action_sequence, result):
@@ -108,22 +113,32 @@ class GameSimulatorUCT:
             self.tree.update(state,action,result)
 
     def simulate_one_game(self,game):
-        for i in range(self.rollout_iterations):
-            sim_game = game.create_simulation_copy()
-            state_action_sequence = self.simulate_tree(sim_game)
-            result, first_action = self.simulate_default(sim_game)
+        state_action_sequence = self.simulate_tree(game)
 
-            if first_action:
+        if game.is_done():
+            self.backup(state_action_sequence,game.get_end_result())
+        else:
+            for i in range(self.rollout_iterations):
+                rollout_game = game.create_simulation_copy()
+                result, first_action = self.simulate_default(rollout_game)
                 state_action_sequence[len(state_action_sequence)-1] = (state_action_sequence[len(state_action_sequence)-1][0],first_action)
-        
-            self.backup(state_action_sequence, result)
+                self.backup(state_action_sequence, result)
 
     def simulate_all_games(self):
         for i in range(self.game_iterations):
-            self.tree = UCTTree(exploration=1) # This creates a new tree for each simulation -> no inter game learning
+            #self.tree = UCTTree(exploration=1) # This creates a new tree for each simulation -> no inter game learning
             game = self.create_game()
             self.simulate_one_game(game)
-        print(self.tree.state_action_pair)
+        for state in self.tree.states:
+            print(state)
+            for action in self.tree.states[state]["A"]:
+                print(action, self.tree.state_action_pairs[(state,action)])
+            print()
+            
+        self.verbose = True
+        game = self.create_game()
+        self.simulate_one_game(game)
+
         
 
 gs = GameSimulatorUCT()

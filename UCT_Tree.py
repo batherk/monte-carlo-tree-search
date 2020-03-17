@@ -7,10 +7,21 @@ class UCTTree:
     def __init__(self, exploration=0):
         self.exploration = exploration
         self.states = {}
-        self.state_action_pair = {}
+        self.state_action_pairs = {}
         
     def __contains__(self, state):
         return state in self.states
+
+    def Q(self,state,action):
+        """ Q value of a state-action pair """
+        return self.state_action_pairs[(state,action)]["Q"]
+    
+    def N(self, state, action=None):
+        """ Number of times visited for a state or a state-action pair"""
+        if not action:
+            return self.states[state]["N"]
+        else:
+            return self.state_action_pairs[(state,action)]["N"]
 
     def default_action(self, game):
         """
@@ -20,15 +31,15 @@ class UCTTree:
         return random.choice(actions)
 
     def get_max_action_value(self, state, action):
-        return self.state_action_pair[(state,action)]["Q"] + self.get_exploration_bonus(state, action)
+        return self.Q(state,action) + self.get_exploration_bonus(state, action)
 
     def get_min_action_value(self, state, action):
-        return self.state_action_pair[(state,action)]["Q"] - self.get_exploration_bonus(state, action)
+        return self.Q(state,action) - self.get_exploration_bonus(state, action)
 
     def get_exploration_bonus(self, state, action):
-        if not self.state_action_pair[(state,action)]["N"]:
+        if not self.N(state,action):
             return 0
-        temp = np.log(self.states[state]["N"])/self.state_action_pair[(state,action)]["N"]
+        temp = np.log(self.N(state))/self.N(state,action)
         return self.exploration * np.sqrt(temp)
 
     def select_action(self, game):
@@ -46,18 +57,14 @@ class UCTTree:
 
     def update(self, state, action, result):
         self.states[state]["N"] += 1
-        self.state_action_pair[(state,action)]["N"] += 1
-        self.state_action_pair[(state,action)]["Q"] = (result-self.state_action_pair[(state,action)]["Q"])/self.state_action_pair[(state,action)]["N"]
+        self.state_action_pairs[(state,action)]["N"] += 1
+        self.state_action_pairs[(state,action)]["Q"] += (result-self.Q(state,action))/self.N(state,action)
 
-
-
-        
-    
     def add_state(self, game, state):
         actions = game.get_possible_actions()
         self.states[state] = {"N":0,"A":actions}
         for action in actions:
-            self.state_action_pair[(state,action)] = {"N":0,"Q":0}
+            self.state_action_pairs[(state,action)] = {"N":0,"Q":0}
 
     def clean():
         self.states = {}

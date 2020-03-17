@@ -53,5 +53,5 @@ class Ledge(Game):
         return Ledge(deepcopy(self.board), self.current_player)
 
     def get_state(self):
-        return tuple(self.board)
+        return (tuple(self.board), self.current_player)
         
