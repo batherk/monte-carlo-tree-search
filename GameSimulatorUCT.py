@@ -26,14 +26,6 @@ VERBOSE = True
 
 # Help functions
 
-def convert_raises_exception(input,convertion):
-    try:
-        convertion(input)
-        return True
-    except ValueError:
-        return False
-
-
 def get_user_input(message, regex=None, legal_values=[], set_type=str):
     user_input = input(message)
     if regex:
