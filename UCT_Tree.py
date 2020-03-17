@@ -4,10 +4,14 @@ import random
 class UCTTree:
     """ Chooses a random action every time, does not learn"""
 
-    def __init__(self):
+    def __init__(self, exploration=0):
+        self.exploration = exploration
         self.states = {}
         self.state_action_pair = {}
         
+    def __contains__(self, state):
+        return state in self.states
+
     def default_action(self, game):
         """
         This method takes the argument game and returns an action in its given state. 
@@ -15,29 +19,45 @@ class UCTTree:
         actions = game.get_possible_actions()
         return random.choice(actions)
 
-    def select_action(self, state, player):
+    def get_max_action_value(self, state, action):
+        return self.state_action_pair[(state,action)]["Q"] + self.get_exploration_bonus(state, action)
 
-        for action in self.states[state]["actions"]:
-            sum_results = self.states[state]['actions'][action]["sum_results"]
-            visited = self.states[state]['actions'][action]["visited"]
+    def get_min_action_value(self, state, action):
+        return self.state_action_pair[(state,action)]["Q"] - self.get_exploration_bonus(state, action)
 
-            average = sum_results/visited
+    def get_exploration_bonus(self, state, action):
+        if not self.state_action_pair[(state,action)]["N"]:
+            return 0
+        temp = np.log(self.states[state]["N"])/self.state_action_pair[(state,action)]["N"]
+        return self.exploration * np.sqrt(temp)
 
-            if self.max and average > best_value or not self.max and average < best_value:
-                best_action = action
-                best_value = average
-        return best_action
+    def select_action(self, game):
+        state = game.get_state()
+        actions = game.get_possible_actions()
 
-    def update(self, state, action, reward):
-        if not state in self.states:
-            self.states[state] = {"visited": 0, "actions":{}}
-        self.states[state]["visited"] += 1
+        if game.current_player ==1:
+            values = [self.get_max_action_value(state,action) for action in actions]
+            index = values.index(max(values))
+        else:
+            values = [self.get_min_action_value(state,action) for action in actions]
+            index = values.index(min(values))
 
-        if not action in self.states[state]['actions']:
-            self.states[state]['actions'][action] = {"visited": 0, "sum_results":0}
-        self.states[state]['actions'][action]["visited"] += 1 
-        self.states[state]['actions'][action]["sum_results"] += reward
+        return actions[index]
+
+    def update(self, state, action, result):
+        self.states[state]["N"] += 1
+        self.state_action_pair[(state,action)]["N"] += 1
+        self.state_action_pair[(state,action)]["Q"] = (result-self.state_action_pair[(state,action)]["Q"])/self.state_action_pair[(state,action)]["N"]
+
+
+
         
+    
+    def add_state(self, game, state):
+        actions = game.get_possible_actions()
+        self.states[state] = {"N":0,"A":actions}
+        for action in actions:
+            self.state_action_pair[(state,action)] = {"N":0,"Q":0}
 
     def clean():
         self.states = {}

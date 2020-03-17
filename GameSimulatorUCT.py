@@ -78,31 +78,52 @@ class GameSimulatorUCT:
             return Ledge(self.board, self.starting_player)
 
     def simulate_default(self, game):
+        first_action = None
+
         while not game.is_done():
             action = self.tree.default_action(game)
+
+            if not first_action:
+                first_action = action
+
             game.perform_action(action)
-            if self.verbose:
-                print(game)
-        return game.get_end_result()
+        return game.get_end_result(), first_action
 
     def simulate_tree(self,game):
-        pass
+        sequence = []
+        while not game.is_done():
+            state = game.get_state()
+            
+            if state not in self.tree:
+                self.tree.add_state(game,state)
+                sequence.append((state,None))
+                return sequence
+            action = self.tree.select_action(game)
+            game.perform_action(action)
+            sequence.append((state,action))
+        return sequence[:-1]
 
-    def backup(self, state_sequence, result):
-        pass
+    def backup(self, state_action_sequence, result):
+        for state, action in state_action_sequence:
+            self.tree.update(state,action,result)
 
     def simulate_one_game(self,game):
-        if self.verbose:
-            print(game)
-        state_sequence = self.simulate_tree(game)
-        result = self.simulate_default(game)
-        self.backup(state_sequence, result)
+        for i in range(self.rollout_iterations):
+            sim_game = game.create_simulation_copy()
+            state_action_sequence = self.simulate_tree(sim_game)
+            result, first_action = self.simulate_default(sim_game)
+
+            if first_action:
+                state_action_sequence[len(state_action_sequence)-1] = (state_action_sequence[len(state_action_sequence)-1][0],first_action)
+        
+            self.backup(state_action_sequence, result)
 
     def simulate_all_games(self):
         for i in range(self.game_iterations):
-            self.tree = UCTTree() # This creates a new tree for each simulation -> no inter game learning
+            self.tree = UCTTree(exploration=1) # This creates a new tree for each simulation -> no inter game learning
             game = self.create_game()
             self.simulate_one_game(game)
+        print(self.tree.state_action_pair)
         
 
 gs = GameSimulatorUCT()
