@@ -100,12 +100,11 @@ class GameSimulatorUCT:
 
     def simulate_all_games(self):
         for i in range(self.game_iterations):
+            self.tree = UCTTree() # This creates a new tree for each simulation -> no inter game learning
             game = self.create_game()
             self.simulate_one_game(game)
         
 
 gs = GameSimulatorUCT()
-tree = UCTTree()
-
 gs.simulate_all_games()
     

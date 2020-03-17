@@ -4,7 +4,7 @@ import random
 class UCTTree:
     """ Chooses a random action every time, does not learn"""
 
-    def __init__(self, max=True):
+    def __init__(self):
         self.states = {}
         self.state_action_pair = {}
         
