@@ -46,7 +46,7 @@ def get_user_input(message, regex=None, legal_values=[], set_type=str):
     return set_type(user_input)
     
 
-class GameSimulator:
+class GameSimulatorActor:
 
     def __init__(self):
         if USE_UI:
@@ -121,7 +121,7 @@ class GameSimulator:
             self.run_one_game(game,actor1,actor2)
         
 
-gs = GameSimulator()
+gs = GameSimulatorActor()
 
 actor1 = RandomActor()
 actor2 = RandomActor(False)
