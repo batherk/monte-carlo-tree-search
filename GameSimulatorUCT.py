@@ -101,7 +101,6 @@ class GameSimulatorUCT:
             print(game)
         while not game.is_done():
             state = game.get_state()
-            
             if state not in self.tree:
                 self.tree.add_state(game,state)
                 sequence.append((state,None))
@@ -136,6 +135,21 @@ class GameSimulatorUCT:
             game = self.create_game()
             self.simulate_one_game(game)
 
+    def evaluate_leaf(self,game:NIM, rollout_iterations=None):
+        sum_results = 0
+
+        if not rollout_iterations:
+            rollout_iterations = self.rollout_iterations
+
+        for i in range (rollout_iterations):
+            game_copy = game.create_simulation_copy()
+            while not game_copy.is_done():
+                #print(game_copy.get_possible_actions())
+                action = self.tree.default_action(game_copy)
+                game_copy.perform_action(action)
+            sum_results += game_copy.get_end_result()
+        return sum_results/rollout_iterations          
+
     def play_games(self, times=1, exploration=0):
         self.tree.exploration = exploration
         for i in range(times):
@@ -154,6 +168,5 @@ gs = GameSimulatorUCT()
 gs.simulate_games()
 
 game = gs.create_game()
-
-
+print(gs.tree.traverse(game))
     

@@ -71,16 +71,12 @@ class UCTTree:
     def traverse(self, game):
         game_copy = game.create_simulation_copy()
         sequence = []
-        while not game_copy.is_done() and game_copy.get_state() in self:
+        while not game_copy.is_done() or game_copy.get_state() in self:
             sequence.append(game_copy.get_state())
             action = self.select_action(game_copy)
             game_copy.perform_action(action)
         sequence.append(game_copy.get_state())
         return sequence
-            
-            
-
-
 
     def print_qs(self):
         for state in self.states:
