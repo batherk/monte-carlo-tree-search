@@ -64,9 +64,32 @@ class UCTTree:
         actions = game.get_possible_actions()
         self.states[state] = {"N":0,"A":actions}
         for action in actions:
-            self.state_action_pairs[(state,action)] = {"N":0,"Q":0}
+            game_copy = game.create_simulation_copy()
+            game_copy.perform_action(action)
+            self.state_action_pairs[(state,action)] = {"N":0,"Q":0,"State":game_copy.get_state()}
 
-    def clean():
+    def traverse(self, game):
+        game_copy = game.create_simulation_copy()
+        sequence = []
+        while not game_copy.is_done() and game_copy.get_state() in self:
+            sequence.append(game_copy.get_state())
+            action = self.select_action(game_copy)
+            game_copy.perform_action(action)
+        sequence.append(game_copy.get_state())
+        return sequence
+            
+            
+
+
+
+    def print_qs(self):
+        for state in self.states:
+                print(state)
+                for action in self.states[state]["A"]:
+                    print(action, self.state_action_pairs[(state,action)])
+                print()
+    
+    def clean(self):
         self.states = {}
 
 

@@ -39,4 +39,5 @@ class NIM(Game):
         return game
 
     def get_state(self):
-        return self.current_amount_pieces
+        return self.current_amount_pieces, self.current_player
+

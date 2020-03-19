@@ -55,3 +55,4 @@ class Ledge(Game):
     def get_state(self):
         return (tuple(self.board), self.current_player)
         
+    

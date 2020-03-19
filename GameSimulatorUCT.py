@@ -11,10 +11,11 @@ GAME_TYPES = ["NIM","Ledge"]
 # Settings
 USE_UI = False
 
-GAME_TYPE = "Ledge"
+GAME_TYPE = "NIM"
 ROLLOUT_ITERATIONS = 500
-GAME_ITERATIONS = 50
+GAME_ITERATIONS = 30
 STARTING_PLAYER = 1
+INTER_GAME_LEARNING = True
 
 # NIM
 STARTING_PIECES = 20
@@ -82,12 +83,16 @@ class GameSimulatorUCT:
         first_action = None
 
         while not game.is_done():
-            action = self.tree.default_action(game)
 
+            action = self.tree.default_action(game)
             if not first_action:
                 first_action = action
 
             game.perform_action(action)
+
+            if self.verbose:
+                print(game)
+                
         return game.get_end_result(), first_action
 
     def simulate_tree(self,game):
@@ -124,23 +129,31 @@ class GameSimulatorUCT:
                 state_action_sequence[len(state_action_sequence)-1] = (state_action_sequence[len(state_action_sequence)-1][0],first_action)
                 self.backup(state_action_sequence, result)
 
-    def simulate_all_games(self):
+    def simulate_games(self):
         for i in range(self.game_iterations):
-            #self.tree = UCTTree(exploration=1) # This creates a new tree for each simulation -> no inter game learning
+            if not INTER_GAME_LEARNING:
+                self.tree = UCTTree(exploration=1) # This creates a new tree for each simulation -> no inter game learning
             game = self.create_game()
             self.simulate_one_game(game)
-        for state in self.tree.states:
-            print(state)
-            for action in self.tree.states[state]["A"]:
-                print(action, self.tree.state_action_pairs[(state,action)])
-            print()
-            
-        self.verbose = True
-        game = self.create_game()
-        self.simulate_one_game(game)
 
+    def play_games(self, times=1, exploration=0):
+        self.tree.exploration = exploration
+        for i in range(times):
+            game = self.create_game()
+            print(game)
+            while not game.is_done():
+                if game.get_state() in self.tree:
+                    action = self.tree.select_action(game)
+                else:
+                    action = self.tree.default_action(game)
+                game.perform_action(action)
+                print(game)
         
 
 gs = GameSimulatorUCT()
-gs.simulate_all_games()
+gs.simulate_games()
+
+game = gs.create_game()
+
+
     

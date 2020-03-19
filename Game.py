@@ -31,6 +31,14 @@ class Game:
             return 1
         elif winner == 2:
             return -1 
+    
+    def get_child_states(self):
+            child_states = []
+            for action in self.get_possible_actions():
+                sim_game = self.create_simulation_copy()
+                sim_game.perform_action(action)
+                child_states.append(sim_game.get_state())
+            return child_states
 
 
 
