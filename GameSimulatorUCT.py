@@ -20,13 +20,13 @@ STARTING_PLAYER_ACTUAL = 1
 EXPLORATION = 1
 
 # NIM
-STARTING_PIECES = 20
-MAX_REMOVE = 7
+STARTING_PIECES = 15
+MAX_REMOVE = 4
 
 # Ledge
 BOARD = [1,0,1,2,0,1]
 
-VERBOSE = True
+VERBOSE = False
 
 # Help functions
 
@@ -108,7 +108,7 @@ class GameSimulatorUCT:
             action = self.tree.select_action(game)
             game.perform_action(action)
             sequence.append((state,action))
-        return sequence[:-1]
+        return sequence
 
     def backprop(self, state_action_sequence, result):
         for state, action in state_action_sequence:
@@ -179,12 +179,9 @@ class GameSimulatorUCT:
                 progress.show(i)
             if game.get_winner() == 1:
                 player1_wins += 1
-        print()
         
-        print("How many times each player started:")
-        print(f'Player 1: {player1_starts} ({player1_starts/self.game_iterations*100:.1f}%). Player 2: {self.game_iterations-player1_starts} ({(self.game_iterations-player1_starts)/self.game_iterations*100:.1f}%)\n')
-        print("How many times each player won:")        
-        print(f'Player 1: {player1_wins} ({player1_wins/self.game_iterations*100:.1f}%). Player 2: {self.game_iterations-player1_wins} ({(self.game_iterations-player1_wins)/self.game_iterations*100:.1f}%)')
+        print(f'\nPlayer 1 started {player1_starts} of {self.game_iterations} games ({player1_starts/self.game_iterations*100:.1f}%).')        
+        print(f'Player 1 won {player1_wins} of {self.game_iterations} games ({player1_wins/self.game_iterations*100:.1f}%).\n')
         
 
 gs = GameSimulatorUCT()
