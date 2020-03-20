@@ -1,7 +1,8 @@
 import random
+from abc import ABC, abstractclassmethod
 
 
-class Game:
+class Game(ABC):
 
     def __init__(self, starting_player):
         if starting_player == 3:
@@ -35,10 +36,28 @@ class Game:
     def get_child_states(self):
             child_states = []
             for action in self.get_possible_actions():
-                sim_game = self.create_simulation_copy()
+                sim_game = self.copy()
                 sim_game.perform_action(action)
                 child_states.append(sim_game.get_state())
             return child_states
+
+    # Abstract methods
+
+    @abstractclassmethod
+    def is_done(self):
+        pass
+
+    @abstractclassmethod
+    def copy(self):
+        pass
+
+    @abstractclassmethod
+    def get_state(self):
+        pass
+
+    @abstractclassmethod
+    def perform_action(self):
+        pass
 
 
 

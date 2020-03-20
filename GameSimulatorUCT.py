@@ -12,15 +12,15 @@ GAME_TYPES = ["NIM","Ledge"]
 # Settings
 USE_UI = False
 
-GAME_TYPE = "Ledge"
+GAME_TYPE = "NIM"
 ROLLOUT_ITERATIONS = 1000
-GAME_ITERATIONS = 10
+GAME_ITERATIONS = 30
 STARTING_PLAYER_SIMULATIONS = 3
 STARTING_PLAYER_ACTUAL = 1
 EXPLORATION = 1
 
 # NIM
-STARTING_PIECES = 15
+STARTING_PIECES = 30
 MAX_REMOVE = 4
 
 # Ledge
@@ -139,22 +139,13 @@ class GameSimulatorUCT:
             game = self.create_game()
             self.simulate_game(game)
 
-
     def evaluate_leaf(self,game, rollout_iterations=None):
-        sum_results = 0
-
-        if not rollout_iterations:
-            rollout_iterations = self.rollout_iterations
-
-        for i in range (rollout_iterations):
-            game_copy = game.create_simulation_copy()
-            while not game_copy.is_done():
-                #print(game_copy.get_possible_actions())
-                action = self.tree.default_action(game_copy)
-                game_copy.perform_action(action)
-            sum_results += game_copy.get_end_result()
-        return sum_results/rollout_iterations          
-
+        game_copy = game.copy()
+        while not game_copy.is_done():
+            action = self.tree.default_action(game_copy)
+            game_copy.perform_action(action)
+        return game_copy.get_end_result()
+               
     def play_games(self):
         player1_wins = 0
         player1_starts = 0

@@ -94,7 +94,7 @@ class GameSimulatorActor:
                 actor = actor2
             state = game.get_state()
             for i in range(self.rollout_iterations):
-                simulation_copy = game.create_simulation_copy()
+                simulation_copy = game.copy()
                 action = actor.get_action(simulation_copy)
                 simulation_copy.perform_action(action)
 

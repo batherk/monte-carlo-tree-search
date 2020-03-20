@@ -68,7 +68,7 @@ class Ledge(Game):
     def is_done(self):
         return self.board.count(2) == 0
 
-    def create_simulation_copy(self):
+    def copy(self):
         copy = Ledge(deepcopy(self.board), self.current_player)
         copy.last_action = self.last_action
         return copy

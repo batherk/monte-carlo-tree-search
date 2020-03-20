@@ -40,7 +40,7 @@ class NIM(Game):
     def is_done(self):
         return self.current_amount_pieces==0
     
-    def create_simulation_copy(self):
+    def copy(self):
         game = NIM(self.start_amount_pieces, self.max_amount_remove, self.current_player)
         game.current_amount_pieces = self.current_amount_pieces
         game.last_action = self.last_action
