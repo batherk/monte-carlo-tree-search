@@ -5,7 +5,7 @@ class Game:
 
     def __init__(self, starting_player):
         if starting_player == 3:
-            self.starting_player = random.randint(0,1)
+            self.starting_player = random.randint(1,2)
         elif starting_player in [1,2]:
             self.starting_player = starting_player
         else:

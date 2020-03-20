@@ -37,9 +37,10 @@ class UCTTree:
         return self.Q(state,action) - self.get_exploration_bonus(state, action)
 
     def get_exploration_bonus(self, state, action):
-        if not self.N(state,action):
-            return 0
-        temp = np.log(self.N(state))/self.N(state,action)
+        if self.N(state,action):
+            temp = np.log(self.N(state)/self.N(state,action))
+        else: 
+            temp = np.log(self.N(state)/0.5)
         return self.exploration * np.sqrt(temp)
 
     def select_action(self, game):
