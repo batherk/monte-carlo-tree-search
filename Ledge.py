@@ -11,9 +11,27 @@ class Ledge(Game):
         if board_init.count(2) != 1:
             raise RuntimeError('The board should have one Gold coin (2)')
         self.board = board_init
+        self.last_action = None
+        self.stones = {1:"copper", 2: "gold"}
 
     def __str__(self):
-        return f'Ledge - Board: {self.board}. Player: {self.current_player}.'
+        if not self.last_action:
+            return f"Start board: {self.board}. Player {self.current_player} will start."
+        elif self.is_done():
+            return f"{self.board}. {self.explenation_last_action()} and won."
+        else:
+            return f"{self.board}. {self.explenation_last_action()}."
+
+    def explenation_last_action(self):
+        place_from, place_to = self.last_action
+        if place_to == place_from and self.is_done():
+            return f"Player {self.get_other_player()} picked up gold"
+        elif place_to == place_from:
+            return f"Player {self.get_other_player()} picked up copper"
+        else:
+            stone = self.stones[self.board[place_to]]
+            return f"Player {self.get_other_player()} moved {stone} from {place_from} to {place_to}"
+ 
 
     def get_possible_actions(self):
         if self.is_done():
@@ -43,6 +61,7 @@ class Ledge(Game):
                 self.board[action[0]] = 0
                 self.board[action[1]] = piece
             self.switch_player()
+            self.last_action = action
         else: 
             print('Not a possible action')
 
@@ -50,7 +69,9 @@ class Ledge(Game):
         return self.board.count(2) == 0
 
     def create_simulation_copy(self):
-        return Ledge(deepcopy(self.board), self.current_player)
+        copy = Ledge(deepcopy(self.board), self.current_player)
+        copy.last_action = self.last_action
+        return copy
 
     def get_state(self):
         return (tuple(self.board), self.current_player)

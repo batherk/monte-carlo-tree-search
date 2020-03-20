@@ -10,11 +10,11 @@ GAME_TYPES = ["NIM","Ledge"]
 
 
 # Settings
-USE_UI = True
+USE_UI = False
 
-GAME_TYPE = "NIM"
+GAME_TYPE = "Ledge"
 ROLLOUT_ITERATIONS = 1000
-GAME_ITERATIONS = 50
+GAME_ITERATIONS = 10
 STARTING_PLAYER_SIMULATIONS = 3
 STARTING_PLAYER_ACTUAL = 1
 EXPLORATION = 1
@@ -140,7 +140,7 @@ class GameSimulatorUCT:
             self.simulate_game(game)
 
 
-    def evaluate_leaf(self,game:NIM, rollout_iterations=None):
+    def evaluate_leaf(self,game, rollout_iterations=None):
         sum_results = 0
 
         if not rollout_iterations:

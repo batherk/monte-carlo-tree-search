@@ -14,14 +14,21 @@ class NIM(Game):
         self.start_amount_pieces = start_amount_pieces
         self.current_amount_pieces = start_amount_pieces
         self.max_amount_remove = max_amount_remove
+        self.last_action = None
 
     def __str__(self):
-        return f'NIM - Remaining: {self.current_amount_pieces}. Player: {self.current_player}. Max: {self.max_amount_remove}.'
+        if not self.last_action:
+            return f"Start pile: {self.current_amount_pieces}. Player {self.current_player} will start."
+        elif self.is_done():
+            return f"Player {self.get_winner()} won"
+        else:
+            return f"Player {self.get_other_player()} selected {self.last_action} stones: Remaining stones = {self.current_amount_pieces}"
 
     def perform_action(self,action):
         if action in self.get_possible_actions():
             self.current_amount_pieces -= action
             self.switch_player()
+            self.last_action = action
         elif self.is_done():
             print("Game is done")
         else: 
@@ -36,6 +43,7 @@ class NIM(Game):
     def create_simulation_copy(self):
         game = NIM(self.start_amount_pieces, self.max_amount_remove, self.current_player)
         game.current_amount_pieces = self.current_amount_pieces
+        game.last_action = self.last_action
         return game
 
     def get_state(self):
