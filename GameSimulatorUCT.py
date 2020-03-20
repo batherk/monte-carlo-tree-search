@@ -43,8 +43,16 @@ def get_user_input(message, regex=None, legal_values=[], set_type=str):
     
 
 class GameSimulatorUCT:
+    """
+    A simulator class that uses UCT to learn and play games.
+    """
 
     def __init__(self):
+        """
+        Creates a simulator object. 
+        If USE_UI is True then the user can fill in the needed values.
+        Else, the settings above the class definition is used.
+        """
         if USE_UI:
             self.game_type = get_user_input("Game type: ",legal_values=GAME_TYPES)
             self.game_iterations = get_user_input("Game iterations: ", regex=r"[0-9]+",set_type=int)
@@ -78,6 +86,7 @@ class GameSimulatorUCT:
         self.starting_player_simulations = STARTING_PLAYER_SIMULATIONS
         
     def create_game(self, SIM=True):
+        """Creates a game based on the simulator's attributes."""
         if SIM:
             starting_player = self.starting_player_simulations
         else:
@@ -89,6 +98,7 @@ class GameSimulatorUCT:
             return Ledge(deepcopy(self.board), starting_player)
 
     def sim_default(self, game):
+        """Simulates a game by using the default policy. Returns the first action that is used for learning purposes."""
         first_action = None
         while not game.is_done():
             action = self.tree.default_action(game)
@@ -98,6 +108,11 @@ class GameSimulatorUCT:
         return first_action
 
     def sim_tree(self,game):
+        """
+        Simulates a game using the tree policy.
+        It stops when the state is not recognized in the UCT-tree structure.
+        Returns a list of state-action pairs that have been visited.
+        """
         sequence = []
         while not game.is_done():
             state = game.get_state()
@@ -111,10 +126,12 @@ class GameSimulatorUCT:
         return sequence
 
     def backprop(self, state_action_sequence, result):
+        """Iterates through a list of state-action pairs and updates the UCT-values based on the end result."""
         for state, action in state_action_sequence:
             self.tree.update(state,action,result)
 
     def simulate_game(self,game):
+        """Simulates a game and updates the UCT-tree with the results"""
         state_action_sequence = self.sim_tree(game)
         if not game.is_done():
             first_action = self.sim_default(game)
@@ -122,6 +139,10 @@ class GameSimulatorUCT:
         self.backprop(state_action_sequence, game.get_end_result())
     
     def play_game(self,game):
+        """
+        Plays a game using preferably the tree policy, but if that's not possible, using the default policy.
+        Prints the game's states if verbose is set to True.
+        """
         if self.verbose:
             print(game)
         while not game.is_done():
@@ -134,12 +155,14 @@ class GameSimulatorUCT:
                 print(game)
 
     def simulate_games(self):
+        """Simulates games given the amount of rollout iterations."""
         times = self.rollout_iterations
         for i in range(times):
             game = self.create_game()
             self.simulate_game(game)
 
-    def evaluate_leaf(self,game, rollout_iterations=None):
+    def evaluate_leaf(self,game):
+        """Returns the evaulation of a state by a rollout and using the default policy."""
         game_copy = game.copy()
         while not game_copy.is_done():
             action = self.tree.default_action(game_copy)
@@ -147,6 +170,11 @@ class GameSimulatorUCT:
         return game_copy.get_end_result()
                
     def play_games(self):
+        """
+        Plays the amount of games that is given by game_iterations.
+        If self.verbose is set to False, the progress of the games played will be shown.
+        Lastly, the result statistics of the games played will be printed. 
+        """
         player1_wins = 0
         player1_starts = 0
         if not self.verbose:
