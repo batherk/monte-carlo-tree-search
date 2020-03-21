@@ -117,8 +117,7 @@ class GameSimulatorUCT:
         while not game.is_done():
             state = game.get_state()
             if state not in self.tree:
-                self.tree.add_state(game,state)
-                sequence.append((state,None))
+                self.tree.add_state(game)
                 return sequence
             action = self.tree.select_action(game)
             game.perform_action(action)
@@ -134,8 +133,9 @@ class GameSimulatorUCT:
         """Simulates a game and updates the UCT-tree with the results"""
         state_action_sequence = self.sim_tree(game)
         if not game.is_done():
-            first_action = self.sim_default(game)
-            state_action_sequence[len(state_action_sequence)-1] = (state_action_sequence[len(state_action_sequence)-1][0],first_action)
+            state = game.get_state()
+            action = self.sim_default(game)
+            state_action_sequence.append((state,action))
         self.backprop(state_action_sequence, game.get_end_result())
     
     def play_game(self,game):

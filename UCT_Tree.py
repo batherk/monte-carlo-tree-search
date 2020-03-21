@@ -69,8 +69,9 @@ class UCTTree:
         self.state_action_pairs[(state,action)]["N"] += 1
         self.state_action_pairs[(state,action)]["Q"] += (result-self.Q(state,action))/self.N(state,action)
 
-    def add_state(self, game, state):
+    def add_state(self, game):
         """Add a state to the tree structure."""
+        state = game.get_state()
         actions = game.get_possible_actions()
         self.states[state] = {"N":0,"A":actions}
         for action in actions:
