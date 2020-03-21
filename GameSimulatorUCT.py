@@ -28,9 +28,10 @@ BOARD = [1,0,1,2,0,1]
 
 VERBOSE = False
 
-# Help functions
+# Help function
 
 def get_user_input(message, regex=None, legal_values=[], set_type=str):
+    """Method for getting correct user input using regex"""
     user_input = input(message)
     if regex:
         pattern = re.compile(regex)
