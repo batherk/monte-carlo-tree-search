@@ -16,7 +16,7 @@ GAME_TYPE = "NIM"
 ROLLOUT_ITERATIONS = 1000
 GAME_ITERATIONS = 30
 STARTING_PLAYER_SIMULATIONS = 3
-STARTING_PLAYER_ACTUAL = 1
+STARTING_PLAYER_ACTUAL = 3
 EXPLORATION = 1
 
 # NIM
@@ -202,6 +202,12 @@ class GameSimulatorUCT:
         print(f'\nPlayer 1 started {player1_starts} of {self.game_iterations} games ({player1_starts/self.game_iterations*100:.1f}%).')        
         print(f'Player 1 won {player1_wins} of {self.game_iterations} games ({player1_wins/self.game_iterations*100:.1f}%).\n')
         
+    def traverse(self,game):
+        """Traverses from the root state to a leaf state in the UCT-tree structure."""
+        return self.tree.traverse(game)
+
+
 
 gs = GameSimulatorUCT()
+gs.simulate_games()
 gs.play_games()

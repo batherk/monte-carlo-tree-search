@@ -83,7 +83,9 @@ class UCTTree:
         """Returns a list of the states from the root node to the leaf node."""
         game_copy = game.copy()
         sequence = []
-        while not game_copy.is_done() or game_copy.get_state() in self:
+        if game_copy.get_state() not in self:
+            raise ValueError("Root state is not in the tree structure")
+        while not game_copy.is_done() and game_copy.get_state() in self:
             sequence.append(game_copy.get_state())
             action = self.select_action(game_copy)
             game_copy.perform_action(action)
