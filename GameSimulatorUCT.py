@@ -206,9 +206,3 @@ class GameSimulatorUCT:
     def traverse(self,game):
         """Traverses from the root state to a leaf state in the UCT-tree structure."""
         return self.tree.traverse(game)
-
-
-
-gs = GameSimulatorUCT()
-gs.simulate_games()
-gs.play_games()
