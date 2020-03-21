@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from Settings import EXPLORATION
    
 class UCTTree:
     """
@@ -7,7 +8,7 @@ class UCTTree:
     It also chooses actions, given a state, based on the UCT-method. 
     """
 
-    def __init__(self, exploration=0):
+    def __init__(self, exploration=EXPLORATION):
         """Creates a UCT-tree."""
         self.exploration = exploration
         self.states = {}
@@ -103,7 +104,19 @@ class UCTTree:
     def clean(self):
         """Removes the stored data."""
         self.states = {}
+        self.state_action_pairs = {}
 
+    def set_exploration(self, exploration):
+        """Set the exploration constant."""
+        self.exploration = exploration
+
+    def reset_exploration(self):
+        """Reset the exploration constant."""
+        self.exploration = EXPLORATION
+
+    def exploit(self):
+        """Setting the exploration constant to 0. Greedingly choosing the next action"""
+        self.set_exploration(0)
 
   
         

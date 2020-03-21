@@ -1,47 +1,10 @@
-import re
 from Ledge import Ledge
 from NIM import NIM
 from UCT_Tree import UCTTree
 from copy import deepcopy
 from ProgressBar import ProgressBar
-
-# Constants
-GAME_TYPES = ["NIM","Ledge"]
-
-
-# Settings
-USE_UI = False
-
-GAME_TYPE = "NIM"
-ROLLOUT_ITERATIONS = 1000
-GAME_ITERATIONS = 30
-STARTING_PLAYER_SIMULATIONS = 3
-STARTING_PLAYER_ACTUAL = 3
-EXPLORATION = 1
-
-# NIM
-STARTING_PIECES = 30
-MAX_REMOVE = 4
-
-# Ledge
-BOARD = [1,0,1,2,0,1]
-
-VERBOSE = False
-
-# Help function
-
-def get_user_input(message, regex=None, legal_values=[], set_type=str):
-    """Method for getting correct user input using regex"""
-    user_input = input(message)
-    if regex:
-        pattern = re.compile(regex)
-        while not pattern.match(user_input):
-            user_input = input(f'Regex: "{regex}": ')
-    elif legal_values: 
-        while user_input not in legal_values:
-            user_input = input(f'Legal values: "{legal_values}": ')
-    return set_type(user_input)
-    
+from Settings import *
+from Functions import get_user_input
 
 class GameSimulatorUCT:
     """
@@ -83,7 +46,7 @@ class GameSimulatorUCT:
                 self.board = BOARD
         self.verbose = VERBOSE
         self.exploration = EXPLORATION
-        self.tree = UCTTree(exploration=self.exploration)
+        self.tree = UCTTree()
         self.starting_player_simulations = STARTING_PLAYER_SIMULATIONS
         
     def create_game(self, SIM=True):
@@ -181,16 +144,18 @@ class GameSimulatorUCT:
         if not self.verbose:
             progress = ProgressBar(self.game_iterations, "Playing games:")
         for i in range(self.game_iterations):
-            self.tree = UCTTree(self.exploration)
+            self.tree.clean()                       # <- No inter game learning
+            self.tree.reset_exploration()
             self.simulate_games()
-    
-            self.tree.exploration = 0
+            
             game = self.create_game(SIM=False)
 
             if game.current_player == 1:
                 player1_starts += 1
             if self.verbose:
                 print(f"\nGame {i+1} of {self.game_iterations}:\n")
+
+            self.tree.exploit()
             self.play_game(game)
 
             if self.verbose:
